@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For My Love 💕</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    font-family: 'Segoe UI', Georgia, sans-serif;
+    background: linear-gradient(135deg, #1a0020 0%, #3d0035 40%, #1a0010 100%);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; position: relative;
+  }
+
+  .hearts-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .star {
+    position: absolute; border-radius: 50%; background: white;
+    animation: twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s);
+  }
+  @keyframes twinkle {
+    0%,100% { opacity:0.15; transform:scale(1); }
+    50%      { opacity:0.9; transform:scale(1.5); }
+  }
+
+  .fheart {
+    position: absolute; font-size: var(--fs,18px);
+    animation: floatUp var(--dur,10s) ease-in infinite var(--delay,0s);
+    opacity: 0;
+  }
+  @keyframes floatUp {
+    0%   { transform:translateY(0) rotate(0deg); opacity:0; }
+    10%  { opacity:0.5; }
+    90%  { opacity:0.2; }
+    100% { transform:translateY(-110vh) rotate(25deg); opacity:0; }
+  }
+
+  .orb {
+    position: fixed; border-radius: 50%; filter: blur(70px); opacity: 0.2;
+    animation: orbDrift var(--dur,9s) ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes orbDrift {
+    from { transform:translate(0,0); }
+    to   { transform:translate(var(--tx,30px),var(--ty,20px)); }
+  }
+
+  /* LOGIN CARD */
+  .login-card {
+    position: relative; z-index: 10;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,150,180,0.25);
+    border-radius: 32px; padding: 3.2rem 3rem 2.8rem;
+    width: 90%; max-width: 450px;
+    backdrop-filter: blur(28px); text-align: center;
+    box-shadow: 0 8px 70px rgba(220,50,120,0.3);
+    animation: cardIn 0.9s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes cardIn {
+    from { opacity:0; transform:translateY(50px) scale(0.88); }
+    to   { opacity:1; transform:translateY(0) scale(1); }
+  }
+
+  .rose { font-size:60px; display:block; margin-bottom:0.4rem; animation:roseFloat 3.5s ease-in-out infinite; }
+  @keyframes roseFloat {
+    0%,100% { transform:translateY(0) rotate(-5deg) scale(1); }
+    50%      { transform:translateY(-12px) rotate(5deg) scale(1.08); }
+  }
+  .love-tag { font-size:0.78rem; letter-spacing:0.18em; text-transform:uppercase; color:#ff9ec8; margin-bottom:0.3rem; }
+  .heading  { font-size:1.9rem; font-weight:700; color:#fff; margin-bottom:0.3rem; }
+  .sub      { font-size:0.95rem; color:rgba(255,200,220,0.6); margin-bottom:2rem; }
+
+  .input-wrap { position:relative; margin-bottom:1.3rem; }
+  .name-input {
+    width:100%; background:rgba(255,100,150,0.08);
+    border:1.5px solid rgba(255,150,180,0.25); border-radius:16px;
+    padding:1rem 1.2rem 1rem 3.2rem; font-size:1.1rem; color:#fff;
+    outline:none; transition:all 0.3s; font-family:inherit;
+  }
+  .name-input::placeholder { color:rgba(255,200,220,0.35); }
+  .name-input:focus {
+    border-color:#ff6baa; background:rgba(255,100,150,0.14);
+    box-shadow:0 0 0 4px rgba(255,100,150,0.18);
+  }
+  .input-icon { position:absolute; left:1rem; top:50%; transform:translateY(-50%); font-size:1.2rem; pointer-events:none; }
+
+  .btn {
+    width:100%; padding:1.05rem; border:none; border-radius:16px;
+    font-size:1.1rem; font-weight:600; cursor:pointer;
+    background:linear-gradient(135deg,#e91e8c,#c2185b,#880e4f);
+    color:white; letter-spacing:0.05em;
+    transition:transform 0.18s, box-shadow 0.18s;
+    box-shadow:0 4px 28px rgba(220,50,120,0.5); font-family:inherit;
+  }
+  .btn:hover { transform:translateY(-3px); box-shadow:0 10px 36px rgba(220,50,120,0.65); }
+  .btn:active { transform:scale(0.97); }
+
+  .error {
+    color:#ffb3c6; font-size:0.88rem; margin-top:0.8rem;
+    display:none; animation:shake 0.4s ease;
+  }
+  @keyframes shake {
+    0%,100% { transform:translateX(0); }
+    25%      { transform:translateX(-8px); }
+    75%      { transform:translateX(8px); }
+  }
+
+  /* BIRTHDAY PAGE */
+  .bday-page {
+    display:none; position:fixed; inset:0; z-index:100;
+    background:linear-gradient(135deg,#1a0020 0%,#3d0030 50%,#0d001a 100%);
+    overflow-y:auto; overflow-x:hidden;
+  }
+  .bday-page.visible { display:block; }
+
+  .confetti-canvas { position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+
+  .bday-inner {
+    position:relative; z-index:10; text-align:center;
+    padding:2.5rem 1.5rem 3rem; max-width:760px;
+    margin:0 auto;
+    animation:bdayIn 0.9s cubic-bezier(0.34,1.56,0.64,1) both 0.2s;
+  }
+  @keyframes bdayIn {
+    from { opacity:0; transform:scale(0.7) translateY(40px); }
+    to   { opacity:1; transform:scale(1) translateY(0); }
+  }
+
+  .big-roses { font-size:52px; margin-bottom:0.5rem; animation:roseSwayBig 4s ease-in-out infinite; }
+  @keyframes roseSwayBig {
+    0%,100% { transform:scale(1) rotate(-3deg); }
+    50%      { transform:scale(1.1) rotate(3deg); }
+  }
+
+  .bday-name {
+    font-size:clamp(2rem,7vw,4rem); font-weight:900;
+    background:linear-gradient(90deg,#ff6baa,#ff3d78,#ff9ec8,#ffcce0,#ff6baa);
+    background-size:300%;
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:pinkShift 3s linear infinite;
+    line-height:1.15; margin-bottom:0.3rem;
+  }
+  @keyframes pinkShift {
+    0%   { background-position:0%; }
+    100% { background-position:300%; }
+  }
+  .bday-subtitle { font-size:clamp(0.9rem,2.5vw,1.2rem); color:#ffb3d1; margin-bottom:2rem; letter-spacing:0.04em; }
+
+  /* PHOTO SECTION */
+  .photos-section {
+    display:flex; gap:20px; justify-content:center;
+    flex-wrap:wrap; margin-bottom:2rem;
+  }
+  .photo-frame {
+    position:relative; flex:0 0 auto;
+    width:clamp(140px,38vw,210px);
+    height:clamp(170px,46vw,255px);
+    border-radius:20px; overflow:hidden;
+    border:2.5px solid rgba(255,150,180,0.4);
+    box-shadow:0 8px 40px rgba(220,50,120,0.4);
+    transition:transform 0.3s;
+  }
+  .photo-frame:hover { transform:scale(1.04) rotate(-1deg); }
+
+  /* ⬇ REPLACE src WITH YOUR ACTUAL IMAGE PATHS ⬇ */
+  .photo-frame img { width:100%; height:100%; object-fit:cover; display:block; }
+
+  .photo-label {
+    position:absolute; bottom:0; left:0; right:0;
+    background:linear-gradient(transparent, rgba(100,0,50,0.85));
+    color:rgba(255,220,235,0.95); font-size:0.82rem;
+    letter-spacing:0.1em; text-transform:uppercase;
+    padding:1.2rem 0.5rem 0.6rem; text-align:center;
+  }
+
+  .heart-divider { font-size:1.6rem; align-self:center; animation:heartbeat 1.2s ease-in-out infinite; }
+  @keyframes heartbeat {
+    0%,100% { transform:scale(1); }
+    50%      { transform:scale(1.35); }
+  }
+
+  /* REVEAL BUTTON */
+  .reveal-btn {
+    display:inline-flex; align-items:center; gap:10px;
+    padding:1rem 2.2rem; border:none; border-radius:50px;
+    font-size:1.05rem; font-weight:600; cursor:pointer;
+    background:linear-gradient(135deg,#e91e8c,#c2185b);
+    color:white; letter-spacing:0.04em;
+    box-shadow:0 6px 30px rgba(220,50,120,0.55);
+    transition:transform 0.2s, box-shadow 0.2s;
+    font-family:inherit; margin-bottom:2rem;
+  }
+  .reveal-btn:hover { transform:translateY(-3px); box-shadow:0 10px 40px rgba(220,50,120,0.7); }
+  .reveal-btn:active { transform:scale(0.97); }
+
+  /* MESSAGE CARD - hidden until reveal */
+  .love-card {
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,150,180,0.22);
+    border-radius:24px; padding:0 2.2rem;
+    backdrop-filter:blur(20px);
+    margin-bottom:1.8rem; text-align:left;
+    max-height:0; overflow:hidden; opacity:0;
+    transition:max-height 1s ease, opacity 0.8s ease, padding 0.5s ease;
+  }
+  .love-card.open { max-height:800px; opacity:1; padding:2rem 2.2rem; }
+  .love-card .from-him {
+    font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase;
+    color:#ff9ec8; margin-bottom:0.9rem;
+  }
+  .love-card p {
+    font-size:clamp(0.92rem,2.2vw,1.08rem);
+    color:rgba(255,220,235,0.9); line-height:1.9; margin-bottom:0.9rem;
+  }
+  .love-card p:last-child { margin-bottom:0; }
+  .love-card span { color:#ff6baa; font-weight:700; }
+  .love-card .sign { margin-top:1rem; font-style:italic; color:rgba(255,180,210,0.7); font-size:0.95rem; }
+
+  /* WISH PILLS */
+  .wishes-row {
+    display:flex; gap:10px; flex-wrap:wrap;
+    justify-content:center; margin-bottom:2rem;
+  }
+  .wish-pill {
+    background:rgba(220,50,120,0.15);
+    border:1px solid rgba(255,100,150,0.3);
+    border-radius:50px; padding:0.45rem 1.1rem;
+    font-size:0.88rem; color:rgba(255,200,220,0.9);
+    white-space:nowrap;
+    animation:pillPop 0.4s var(--delay,0s) both;
+  }
+  @keyframes pillPop {
+    from { opacity:0; transform:scale(0.6); }
+    to   { opacity:1; transform:scale(1); }
+  }
+
+  .back-btn {
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,150,180,0.25);
+    color:rgba(255,200,220,0.7);
+    border-radius:10px; padding:0.6rem 1.6rem;
+    font-size:0.88rem; cursor:pointer;
+    font-family:inherit; transition:all 0.2s;
+  }
+  .back-btn:hover { background:rgba(255,100,150,0.18); color:white; }
+
+  @media (max-width:480px) {
+    .login-card { padding:2.2rem 1.5rem; }
+    .love-card.open { padding:1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hearts-bg" id="heartsBg"></div>
+<div class="orb" style="width:300px;height:300px;background:#c2185b;top:-100px;left:-100px;--dur:10s;--tx:50px;--ty:60px;"></div>
+<div class="orb" style="width:240px;height:240px;background:#880e4f;bottom:-80px;right:-80px;--dur:13s;--tx:-40px;--ty:-50px;"></div>
+
+<!-- LOGIN PAGE -->
+<div class="login-card" id="loginPage">
+  <span class="rose">🩶</span>
+  <p class="love-tag">A surprise awaits you 💌</p>
+  <h1 class="heading">Hey Pretty Lady! 💕</h1>
+  <p class="sub">Darling, what's your name?</p>
+  <div class="input-wrap">
+    <span class="input-icon">🌸</span>
+    <input class="name-input" id="nameInput" type="text"
+      placeholder="Enter your name, love..." autocomplete="off"/>
+  </div>
+  <button class="btn" onclick="handleLogin()">Open Your Surprise 💝</button>
+  <p class="error" id="errorMsg">Hmm, only my love can enter here! 💭</p>
+</div>
+
+<!-- BIRTHDAY PAGE -->
+<div class="bday-page" id="bdayPage">
+  <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+  <div class="bday-inner">
+
+    <div class="big-roses">🌹💕🌹</div>
+    <div class="bday-name">𝒉𝒂𝒑𝒑𝒚 𝒃𝒊𝒓𝒕𝒉𝒅𝒂𝒚.<br>𝒎𝒖𝒎𝒎𝒚 𝒌𝒊 𝑨𝒏𝒏𝒊! 💖</div>
+    <div class="bday-subtitle">The most beautiful day of the year — because you were born 🌙</div>
+
+    <!-- PHOTO SECTION -->
+    <div class="photos-section">
+
+      <!-- ✏️ Replace "your-photo.jpg" with your photo filename -->
+      <div class="photo-frame">
+        <img src="piccc1.jpeg"
+          onerror="this.parentElement.style.background='linear-gradient(135deg,#3d0035,#880e4f)';this.style.display='none';this.parentElement.querySelector('.photo-label').textContent='📸 Add Your Photo'" />
+
+      </div>
+
+      <div class="heart-divider">❤️</div>
+
+      <!-- ✏️ Replace "jaishree-photo.jpg" with her photo filename -->
+      <div class="photo-frame">
+        <img src="picccc2.jpeg"
+          onerror="this.parentElement.style.background='linear-gradient(135deg,#c2185b,#e91e8c)';this.style.display='none';this.parentElement.querySelector('.photo-label').textContent='📸 Add Her Photo'" />
+        
+      </div>
+
+    </div>
+
+    <!-- WISH PILLS -->
+    <div class="wishes-row">
+      <div class="wish-pill" style="--delay:0.5s">🌹 My Babe</div>
+      <div class="wish-pill" style="--delay:0.65s">💎 My Jannu</div>
+      <div class="wish-pill" style="--delay:0.8s">🌙 My Wife</div>
+      <div class="wish-pill" style="--delay:0.95s">✨ My Rasogulla</div>
+      <div class="wish-pill" style="--delay:1.1s">💫 My Life</div>
+    </div>
+
+    <!-- REVEAL BUTTON -->
+    <button class="reveal-btn" id="revealBtn" onclick="revealMessage()">
+      💌 Read My Message For You
+    </button>
+
+    <!-- LOVE MESSAGE -->
+    <div class="love-card" id="loveCard">
+      <p class="from-him">💌 From your love, just for you...</p>
+      <p>
+        Jaishree, first of all sorry for everything , tereko datne ke liye , tere pe gussa krne ke liye or v sb kuch ke liye 
+        , but meri haar baat ke peeche <span>mera pyar hota h tere liye</span> . 
+        thank you my babe for coming in my life and <span>make my life colourful.</span>
+        Mai janta hu i am not perfect , chutiya types hu na kuch waisa hero types looks h .
+        but phr v you loved me .
+      </p>
+      <p>
+        mere pass kuch  nhi h na ghr na gari  na paisa na looks phr v tune bina kuch chahe sirf mere se pyar kiya or mere liye itna 
+        kuch kiya .
+        Thank You my Love.
+        <span>You are the best thing that i ever recieved from god</span> or tu v ek karan h kii mai bhagwan jii pe itna jda viswas krne lga huu.
+      </p>
+      <p>
+        On your birthday, I wish you <span>all the happiness in the universe</span> —
+        because trust me, you deserve every bit of it and so much more.
+        I love you more than words can ever say. 💕
+        <br>
+        <span>I LOVE YOU MY WIFEY....</span>
+      </p>
+      <p class="sign">— Forever yours, with all my heart 🥀</p>
+    </div>
+
+    <button class="back-btn" onclick="goBack()">← Go back</button>
+  </div>
+</div>
+
+<script>
+  // Stars
+  const bg = document.getElementById('heartsBg');
+  for (let i = 0; i < 55; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2.5 + 0.8;
+    s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*5}s;--delay:-${Math.random()*5}s;`;
+    bg.appendChild(s);
+  }
+
+  // Floating hearts — only 10
+  const heartEmojis = ['💕','🌹','❤️','💗','💖','🌸'];
+  for (let i = 0; i < 10; i++) {
+    const h = document.createElement('div');
+    h.className = 'fheart';
+    const sz = Math.random() * 18 + 10;
+    h.style.cssText = `left:${Math.random()*100}%;bottom:-30px;--fs:${sz}px;--dur:${10+Math.random()*10}s;--delay:${Math.random()*10}s;`;
+    h.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+    bg.appendChild(h);
+  }
+
+  // Login
+  function handleLogin() {
+    const val = document.getElementById('nameInput').value.trim().toLowerCase();
+    const err = document.getElementById('errorMsg');
+    if (val === 'jaishree') {
+      err.style.display = 'none';
+      document.getElementById('bdayPage').classList.add('visible');
+      startConfetti();
+    } else {
+      err.style.display = 'block';
+      err.style.animation = 'none';
+      void err.offsetWidth;
+      err.style.animation = 'shake 0.4s ease';
+    }
+  }
+
+  document.getElementById('nameInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+
+  // Reveal message
+  function revealMessage() {
+    const card = document.getElementById('loveCard');
+    const btn  = document.getElementById('revealBtn');
+    card.classList.add('open');
+    btn.style.display = 'none';
+    setTimeout(() => card.scrollIntoView({ behavior:'smooth', block:'center' }), 200);
+  }
+
+  function goBack() {
+    document.getElementById('bdayPage').classList.remove('visible');
+    document.getElementById('loveCard').classList.remove('open');
+    document.getElementById('revealBtn').style.display = 'inline-flex';
+    stopConfetti();
+  }
+
+  // Confetti
+  let confettiAnim = null;
+  const particles = [];
+  const pinkColors = ['#ff6baa','#ff3d78','#ff9ec8','#e91e8c','#f48fb1'];
+
+  function startConfetti() {
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    particles.length = 0;
+    for (let i = 0; i < 60; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
+        w: Math.random() * 12 + 5,
+        h: Math.random() * 7 + 3,
+        color: pinkColors[Math.floor(Math.random() * pinkColors.length)],
+        rot: Math.random() * 360,
+        rSpeed: (Math.random() - 0.5) * 4,
+        vy: Math.random() * 2 + 1.2,
+        vx: (Math.random() - 0.5) * 1.2,
+        isHeart: Math.random() > 0.5
+      });
+    }
+
+    function drawHeart(ctx, x, y, size, color) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      const s = size / 2;
+      ctx.moveTo(x, y + s * 0.5);
+      ctx.bezierCurveTo(x, y, x - s, y, x - s, y + s * 0.4);
+      ctx.bezierCurveTo(x - s, y + s, x, y + s * 1.2, x, y + s * 1.4);
+      ctx.bezierCurveTo(x, y + s * 1.2, x + s, y + s, x + s, y + s * 0.4);
+      ctx.bezierCurveTo(x + s, y, x, y, x, y + s * 0.5);
+      ctx.fill();
+    }
+
+    function loop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot * Math.PI / 180);
+        if (p.isHeart) {
+          drawHeart(ctx, 0, 0, p.w, p.color);
+        } else {
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        }
+        ctx.restore();
+        p.y += p.vy; p.x += p.vx; p.rot += p.rSpeed;
+        if (p.y > canvas.height + 30) { p.y = -20; p.x = Math.random() * canvas.width; }
+      });
+      confettiAnim = requestAnimationFrame(loop);
+    }
+    loop();
+  }
+
+  function stopConfetti() {
+    if (confettiAnim) { cancelAnimationFrame(confettiAnim); confettiAnim = null; }
+    const c = document.getElementById('confettiCanvas');
+    c.getContext('2d').clearRect(0, 0, c.width, c.height);
+  }
+</script>
+</body>
+</html>
